@@ -5,39 +5,45 @@ jobs:
       - image: alpine:3.9
     steps:
       - run:
-          command: true
+          command: |
+            true
   test2:
     docker:
       - image: alpine:3.9
     steps:
       - run:
-          command: true
+          command: |
+            true
   test3:
     docker:
       - image: alpine:3.9
     steps:
       - run:
-          command: true
+          command: |
+            true
   test4:
     docker:
       - image: alpine:3.9
     steps:
       - run:
-          command: true
+          command: |
+            true
 
   build:
     docker:
       - image: alpine:3.9
     steps:
       - run:
-          command: true
+          command: |
+            true
 
   publish:
     docker:
       - image: alpine:3.9
     steps:
       - run:
-          command: true
+          command: |
+            true
 
 workflows:
   version: 2
