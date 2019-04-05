@@ -36,6 +36,8 @@ jobs:
     docker:
       - image: parity/rust-parity-ethereum-build:xenial
     steps:
+      - attach_workspace:
+          at: .
       - run:
           command: |
             FEATURES="json-tests,ci-skip-tests"
