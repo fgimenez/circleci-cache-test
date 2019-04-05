@@ -1,62 +1,54 @@
 version: 2
 jobs:
-  download:
+  test1:
     docker:
       - image: alpine:3.9
     steps:
-      - run:
-          command: |
-            apk add git
-            git clone https://gitlab.parity.io/parity/parity-ethereum.git/ parity-ethereum
-            cd parity-ethereum
-            git submodule update --init --recursive
-      - persist_to_workspace:
-          root: .
-          paths:
-            - parity-ethereum/*
+      - run: true
+  test2:
+    docker:
+      - image: alpine:3.9
+    steps:
+      - run: true
+  test3:
+    docker:
+      - image: alpine:3.9
+    steps:
+      - run: true
+  test4:
+    docker:
+      - image: alpine:3.9
+    steps:
+      - run: true
 
   build:
     docker:
-      - image: parity/rust-parity-ethereum-build:xenial
+      - image: alpine:3.9
     steps:
-      - attach_workspace:
-          at: .
-      - run:
-          command: |
-            FEATURES="json-tests,ci-skip-tests"
-            OPTIONS="--release"
-            #use nproc `linux only
-            THREADS=$(nproc)
+      - run: true
 
-            cd parity-ethereum
-
-            time cargo test $OPTIONS --no-run --features "$FEATURES" --locked --all --target $CARGO_TARGET -- --test-threads $THREADS
-
-  build_test:
+  publish:
     docker:
-      - image: parity/rust-parity-ethereum-build:xenial
+      - image: alpine:3.9
     steps:
-      - attach_workspace:
-          at: .
-      - run:
-          command: |
-            FEATURES="json-tests,ci-skip-tests"
-            OPTIONS="--release"
-            #use nproc `linux only
-            THREADS=$(nproc)
-
-            cd parity-ethereum
-
-            time cargo test $OPTIONS --features "$FEATURES" --locked --all --target $CARGO_TARGET -- --test-threads $THREADS
+      - run: true
 
 workflows:
   version: 2
   circle_cache_test:
     jobs:
-      - download
-      - build:
+      - test1
+      - test2
+      - test3
+      - build
+      - test4:
           requires:
-            - download
-      - build_test:
+            - test1
+            - test2
+            - test3
+      - publish:
           requires:
-            - download
+            - test1
+            - test2
+            - test3
+            - build
