@@ -51,7 +51,7 @@ jobs:
 
 workflows:
   version: 2
-  circle_cahcce_test:
+  circle_cache_test:
     jobs:
       - download
       - build:
