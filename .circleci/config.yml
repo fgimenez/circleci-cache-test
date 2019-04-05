@@ -1,18 +1,34 @@
 version: 2
 jobs:
+  download:
+    docker:
+      - image: alpine:3.9
+    steps:
+      - run:
+          command: |
+            apk add git
+            git clone https://gitlab.parity.io/parity/parity-ethereum.git/ parity-ethereum
+            cd parity-ethereum
+            git submodule update --init --recursive
+      - persist_to_workspace:
+          root: .
+          paths:
+            - parity-ethereum/*
+
   build:
     docker:
       - image: parity/rust-parity-ethereum-build:xenial
     steps:
+      - attach_workspace:
+          at: .
       - run:
           command: |
-            git clone https://gitlab.parity.io/parity/parity-ethereum.git/ .
-            git submodule update --init --recursive
-
             FEATURES="json-tests,ci-skip-tests"
             OPTIONS="--release"
             #use nproc `linux only
             THREADS=$(nproc)
+
+            cd parity-ethereum
 
             time cargo test $OPTIONS --no-run --features "$FEATURES" --locked --all --target $CARGO_TARGET -- --test-threads $THREADS
 
@@ -22,13 +38,12 @@ jobs:
     steps:
       - run:
           command: |
-            git clone https://gitlab.parity.io/parity/parity-ethereum.git/ .
-            git submodule update --init --recursive
-
             FEATURES="json-tests,ci-skip-tests"
             OPTIONS="--release"
             #use nproc `linux only
             THREADS=$(nproc)
+
+            cd parity-ethereum
 
             time cargo test $OPTIONS --features "$FEATURES" --locked --all --target $CARGO_TARGET -- --test-threads $THREADS
 
@@ -36,5 +51,10 @@ workflows:
   version: 2
   circle_cahcce_test:
     jobs:
-      - build
-      - build_test
+      - download
+      - build:
+          requires:
+            - download
+      - build_test:
+          requires:
+            - download
